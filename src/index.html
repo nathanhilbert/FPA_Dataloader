@@ -1,121 +1,344 @@
 <!DOCTYPE html>
-<html ng-app="ngBoilerplate" ng-controller="AppCtrl">
+
+<html lang="en" ng-app="openspending">
   <head>
-    <title ng-bind="pageTitle"></title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import a dataset - OpenSpending</title>
 
-    <!-- social media tags -->
-    <meta name="twitter:card" content="summary">
-    <meta name="twitter:site" content="@joshdmiller">
-    <meta name="twitter:title" content="ngBoilerplate">
-    <meta name="twitter:description" content="Non-Trivial AngularJS Made Easy: Everything you need to kickstart AngularJS projects: a best-practice directory structure, an intelligent build system, and the best web design libraries around.">
-    <meta name="twitter:creator" content="@joshdmiller">
-    <meta name="twitter:image:src" content="https://a248.e.akamai.net/assets.github.com/images/modules/logos_page/Octocat.png?1366128846">
-    <meta property="og:title" content="ngBoilerplate" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="http://bit.ly/ngBoilerplate" />
-    <meta property="og:image" content="https://a248.e.akamai.net/assets.github.com/images/modules/logos_page/Octocat.png?1366128846" />
-    <meta property="og:description" content="Non-Trivial AngularJS Made Easy: Everything you need to kickstart AngularJS projects: a best-practice directory structure, an intelligent build system, and the best web design libraries around.">
+    <meta name="description" content="We're enabling anyone to explore, visualize and track government spending." />
+    <meta name="author" content="Open Knowledge Foundation" />
+    <link rel="shortcut icon" href="http://localhost:5000/static/img/favicon.ico"
+      type="image/x-icon" />
+    <link rel="alternate" type="application/rss+xml"
+      title="Latest Datasets on OpenSpending"
+      href="http://localhost:5000/datasets.rss" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <!-- font awesome from BootstrapCDN -->
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400italic,400,300,600'
+      rel='stylesheet' type='text/css'>
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css"
+      rel="stylesheet">
+    
+      <link href="/static/prod/main.css?c087bc2b" rel="stylesheet" />
+    
 
     <!-- compiled CSS --><% styles.forEach( function ( file ) { %>
     <link rel="stylesheet" type="text/css" href="<%= file %>" /><% }); %>
 
     <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
     <script type="text/javascript" src="<%= file %>"></script><% }); %>
-
-    <!-- it's stupid to have to load it here, but this is for the +1 button -->
-    <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
-      { "parsetags": "explicit" }
-    </script>
+    
+    
+    <!-- TODO: remove the need for this -->
+    
   </head>
-  <body>
+
+  <h1>For simple example.  Needs to be moved into the flask templating</h1>
+
+  <!-- templates/layout.html body -->
+  <body ng-controller="AppCtrl"
+    class="bp-dataset view-new">
+    <div id="page">
+      <div class="navbar navbar-default navbar-static-top" data-dropdown="dropdown">
+  <div class="navbar-inner">
     <div class="container">
-      <div class="navbar navbar-default">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle" ng-init="menuCollapsed = true"
-            ng-click="menuCollapsed = ! menuCollapsed">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <div class="navbar-brand">
-            ngbp
-            <small>
-              <a href="http://github.com/ngbp/ngbp/blob/v<%= version %>-release/CHANGELOG.md">
-                v<%= version %>
+      <div class="navbar-header">
+        
+        <button type="button" class="navbar-toggle collapsed"
+          data-toggle="collapse" data-target="#main-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        
+        <a class="navbar-brand" href="http://localhost:5000/">
+          <span class="green">Open</span>Spending
+        </a>
+
+      </div>
+
+      <div class="collapse navbar-collapse" id="main-collapse">
+        <ul class="nav navbar-nav">
+          <li>
+            <a class="True" href="/datasets">
+              Datasets
+            </a>
+          </li>
+          <li>
+            <a class="" href="http://localhost:5000/search">
+              Search
+            </a>
+          </li>
+          <li>
+            <a href="http://community.openspending.org/">
+              Community
+            </a>
+          </li>
+          <li>
+            <a href="http://community.openspending.org/help/">
+              Help
+            </a>
+          </li>
+          <li>
+            <a href="http://community.openspending.org/about/">
+              About
+            </a>
+          </li>
+          <li>
+            <a href="http://community.openspending.org/contact/">
+              Contact
+            </a>
+          </li>
+          <li>
+            <a class="" href="http://community.openspending.org/blog/">
+              Blog
+            </a>
+          </li>
+        </ul>
+        
+        <ul class="nav navbar-nav navbar-right">
+          
+            <li class="dropdown" dropdown>
+              <a class="dropdown-toggle" dropdown-toggle data-toggle="dropdown">
+                <img src="https://secure.gravatar.com/avatar/cb9492e21bd19263d142fc11c51f4b20?s=20&amp;d=retro&amp;r=g"
+                  alt="admin">
+                <strong>admin2</strong>
               </a>
-            </small>
-          </div>
+
+              <ul class="dropdown-menu account-dropdown" role="menu">
+                <li>
+                  <a href="http://localhost:5000/dashboard">
+                    Dashboard
+                  </a>
+                </li>
+                <li>
+                  <a href="http://localhost:5000/settings">
+                    Settings
+                  </a>
+                </li>
+                
+                  <li class="divider"></li>
+                  <li>
+                    <a href="http://localhost:5000/scoreboard">
+                      User scoreboard
+                    </a>
+                  </li>
+                
+                <li class="divider"></li>
+                <li>
+                  <a href="http://localhost:5000/logout">
+                    Logout
+                  </a>
+                </li>
+              </ul>
+            </li>
+          
+          
+          <li class="dropdown" dropdown>
+            <a class="dropdown-toggle" dropdown-toggle>
+              Language
+            </a>
+            <ul class="dropdown-menu locale-dropdown" role="menu">
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('bs')">
+                    bosanski
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('cs')">
+                    čeština
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('en')">
+                    English
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('is')">
+                    íslenska
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('it')">
+                    italiano
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('ja')">
+                    日本語
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('ne')">
+                    नेपाली
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('pl')">
+                    polski
+                  </a>
+                </li>
+              
+                
+                <li class="locale ">
+                  <a href='#' ng-click="setLocale('ru')">
+                    русский
+                  </a>
+                </li>
+              
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+      <div class="banner">
+        <div class="container">
+          
+            
+          
+          
+            <div ng-show="flash.getMessage()" class="alert alert-{{flash.getMessage()[1]}}">
+              <p>{{flash.getMessage()[0]}}</p>
+            </div>
+          
+          
         </div>
-        <div class="collapse navbar-collapse" collapse="menuCollapsed">
-          <ul class="nav navbar-nav">
-            <li ui-sref-active="active">
-              <a href ui-sref="home">
-                <i class="fa fa-home"></i>
-                Home
-              </a>
-            </li>
-            <li ui-sref-active="active">
-              <a href ui-sref="about">
-                <i class="fa fa-info-circle"></i>
-                What is it?
-              </a>
-            </li>
-            <li>
-              <a href="https://github.com/ngbp/ngbp#readme">
-                <i class="fa fa-book"></i>
-                Read the Docs
-              </a>
-            </li>
-            <li>
-              <a href="https://github.com/ngbp/ngbp">
-                <i class="fa fa-github-alt"></i>
-                Github
-              </a>
-            </li>
-            <li>
-              <a href="https://github.com/ngbp/ngbp/issues">
-                <i class="fa fa-comments"></i>
-                Support
-              </a>
-            </li>
-          </ul>
-        </div>
+      </div>
+
+      <div class="container">
+        
+  <h2 class="page-header">
+    Import a dataset
+  </h2>
+
+  <div class="container" ui-view="main"></div>
+
       </div>
     </div>
 
-    <div class="container" ui-view="main"></div>
+    <div id="catapult-cookie-bar" ng-show="showCookieWarning">
+      This site uses cookies
+      <button id="catapultCookie" ng-click="hideCookieWarning()">
+        Okay, thanks
+      </button>
 
-    <footer class="footer">
-      <div class="container">
-        <div class="footer-inner">
-          <ul class="social">
-            <li><a target="_blank" href="http://gplus.to/joshdmiller"><i class="fa fa-google-plus-sign"></i></a></li>
-            <li><a target="_blank" href="http://twitter.com/joshdmiller"><i class="fa fa-twitter-sign"></i></a></li>
-            <li><a target="_blank" href="http://linkedin.com/in/joshdmiller"><i class="fa fa-linkedin-sign"></i></a></li>
-            <li><a target="_blank" href="http://github.com/ngbp/ngbp"><i class="fa fa-github-sign"></i></a></li>
-          </ul>
-          
+      <a href="http://okfn.org/cookie-policy">
+        Find out more
+      </a>
+    </div>
 
-          <p>
-            (c) 2013 <a href="http://www.joshdavidmiller.com">Josh David Miller</a>. 
-            <a href="http://github.com/ngbp/ngbp/fork_select">Fork this</a>
-            to kickstart your next project.
-            <br />
-            ngbp is based on
-            <a href="http://www.angularjs.org">AngularJS</a>,
-            <a href="http://getbootstrap.com">Bootstrap</a>, 
-            <a href="http://angular-ui.github.com/bootstrap">UI Bootstrap</a>,
-            and 
-            <a href="http://fortawesome.github.com/Font-Awesome">Font Awesome</a>.        
-          </p>
-        </div>
+    <footer>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <p>
+          This is an <a href="http://okfn.org">Open Knowledge Foundation</a>
+          project.
+        </p>
       </div>
-    </footer>
+    </div>
+    <div class="row">    
+      <div class="col-md-4">
+        <ul class="footer-links">
+          <li>
+            <a href="http://wheredoesmymoneygo.org">
+              Where Does My Money Go (UK)
+            </a>
+          </li>
+          <li>
+            <a href="http://offenerhaushalt.de">
+              OffenerHaushalt (DE)
+            </a>
+          </li>
+          <li>
+            <a href="http://opencorporates.com"
+              title="The Open Database Of The Corporate World">
+              OpenCorporates.com
+            </a>
+          </li>
+          <li>
+            <a href="http://okfnlabs.org">
+              OKFN Labs
+            </a>
+          </li>
+          <li>
+            <a href="http://spendingstories.org">
+              Spending Stories
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <ul class="footer-links">
+          <li>
+            <a href="http://twitter.com/openspending">
+              Twitter
+            </a>
+          </li>
+          <li>
+            <a href="http://community.openspending.org/help/">
+              Help
+            </a>
+          </li>
+          <li>
+            <a href="http://community.openspending.org/contact/">
+              Contact
+            </a>
+          </li>
+          <li>
+            <a href="http://community.openspending.org/help/api/">
+              API
+            </a>
+          </li>
+          <li>
+            <a href="http://okfn.org/privacy-policy/">
+              Privacy
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="col-md-4">
+        <p>
+          All <a href="http://www.gnu.org/licenses/agpl.html">code</a>,
+          <a href="http://creativecommons.org/licenses/by/3.0/">content</a>
+          and <a href="http://opendatacommons.org/licenses/odbl/">data</a> is
+          openly licensed.
+        </p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+    <!-- script boot section -->
+    <script defer="defer">
+      var OpenSpending = OpenSpending || {};
+      OpenSpending.localeGroupSeparator = ",";
+      OpenSpending.localeDecimalSeparator = ".";
+    </script>
+    <!-- end script boot section -->
+
+    
+    
   </body>
 </html>

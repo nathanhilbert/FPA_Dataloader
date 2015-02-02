@@ -1,25 +1,161 @@
-angular.module( 'ngBoilerplate', [
-  'templates-app',
-  'templates-common',
-  'ngBoilerplate.home',
-  'ngBoilerplate.about',
-  'ui.router'
-])
 
-.config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
-  $urlRouterProvider.otherwise( '/home' );
-})
+var openspending = angular.module('openspending', ['templates-app','templates-common', 'ngCookies', 'ui.router', 'ui.bootstrap', 'localytics.directives']);
 
-.run( function run () {
-})
 
-.controller( 'AppCtrl', function AppCtrl ( $scope, $location ) {
-  $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-    if ( angular.isDefined( toState.data.pageTitle ) ) {
-      $scope.pageTitle = toState.data.pageTitle + ' | ngBoilerplate' ;
+openspending.controller('AppCtrl', ['$scope', '$location', '$http', '$cookies', '$window', '$sce', 'flash',
+  function($scope, $location, $http, $cookies, $window, $sce, flash) {
+  
+  $scope.flash = flash;
+
+  // EU cookie warning
+  $scope.showCookieWarning = !$cookies.neelieCookie;
+
+  $scope.hideCookieWarning = function() {
+    $cookies.neelieCookie = true;
+    $scope.showCookieWarning = !$cookies.neelieCookie;
+  };
+
+  // Language selector
+  $scope.setLocale = function(locale) {
+    $http.post('/set-locale', {'locale': locale}).then(function(res) {
+      $window.location.reload();
+    });
+    return false;
+  };
+
+  // Allow SCE escaping in the app
+  $scope.trustAsHtml = function(text) {
+    return $sce.trustAsHtml('' + text);
+  };
+
+}]);
+
+
+openspending.factory('flash', ['$rootScope', function($rootScope) {
+  // Message flashing.
+  var currentMessage = null;
+
+  $rootScope.$on("$routeChangeSuccess", function() {
+    currentMessage = null;
+  });
+
+  return {
+    setMessage: function(message, type) {
+      currentMessage = [message, type];
+    },
+    getMessage: function() {
+      return currentMessage;
+    }
+  };
+}]);
+
+
+openspending.factory('validation', ['flash', function(flash) {
+  // handle server-side form validation errors.
+  return {
+    handle: handle = function(form) {
+      return function(res) {
+        if (res.status == 400 || !form) {
+            var errors = [];
+            console.log(res.data.errors);
+            for (var field in res.data.errors) {
+                form[field].$setValidity('value', false);
+                form[field].$message = res.data.errors[field];
+                errors.push(field);
+            }
+            if (angular.isDefined(form._errors)) {
+                angular.forEach(form._errors, function(field) {
+                    if (errors.indexOf(field) == -1) {
+                        form[field].$setValidity('value', true);
+                    }
+                });
+            }
+            form._errors = errors;
+        } else {
+          console.log(res);
+          flash.setMessage(res.data.message || res.data.title || 'Server error', 'danger');
+        }
+      };
+    }
+  };
+}]);
+
+
+openspending.factory('referenceData', ['$http', function($http) {
+  /* This is used to cache reference data once it has been retrieved from the 
+  server. Reference data includes the canonical lists of country names,
+  currencies, etc. */
+  var referenceData = $http.get('/api/3/reference');
+
+  var getData = function(cb) {
+    referenceData.then(function(res) {
+      cb(res.data);
+    });
+  };
+
+  return {'get': getData};
+}]);
+
+
+openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$location', 'referenceData', 'validation',
+  function($scope, $http, $window, $location, referenceData, validation) {
+  /* This controller is not activated via routing, but explicitly through the 
+  dataset.new flask route. */
+  
+  $scope.reference = {};
+  $scope.canCreate = false;
+  $scope.dataset = {'category': 'budget', 'territories': []};
+
+  referenceData.get(function(reference) {
+    $scope.reference = reference;
+  });
+
+  $scope.save = function(form) {
+    var dfd = $http.post('/api/3/datasets', $scope.dataset);
+    dfd.then(function(res) {
+      $location.path('/' + res.data.name + '/manage/meta');
+    }, validation.handle(form));
+  };
+
+  $http.get('/api/2/permissions?dataset=new').then(function(res) {
+    $scope.canCreate = res.data.create;
+  });
+
+}]);
+
+
+openspending.config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
+  $urlRouterProvider.otherwise( '/dataform' );
+});
+
+openspending.config(function OSStateProvider( $stateProvider ) {
+  $stateProvider.state( 'datasetmanager', {
+    url: '/:name/manage',
+    views: {
+      "main": {
+        //controller: 'DatamanagerCrl',
+        templateUrl: 'templates/dataset_manage.tpl.html'
+      }
+    }
+  })
+  .state('datasetmeta', {
+    url: '/:name/manage/meta',
+    views: {
+      "main": {
+        //controller: 'CubeOptionsCtrl',
+        templateUrl: 'templates/dataset_meta.tpl.html'
+      }
+    }
+  })
+  .state('dataform', {
+    url: '/dataform',
+    views: {
+      "main": {
+        //controller: 'CubeOptionsCtrl',
+        templateUrl: 'templates/data_form.tpl.html'
+      }
     }
   });
-})
 
-;
+});
 

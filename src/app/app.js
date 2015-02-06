@@ -50,6 +50,22 @@ openspending.factory('flash', ['$rootScope', function($rootScope) {
 }]);
 
 
+openspending.factory('OSAPIservice', function($http) {
+
+    var OSAPI = {};
+
+
+    OSAPI.getDatasets = function(dataset_params) {
+      //options include
+      //fields=field1,feidl2, and getsources=true
+      return $http({ 
+        url: '/api/3/datasets',
+        params: dataset_params
+      });
+    };
+    return OSAPI;
+  });
+
 openspending.factory('validation', ['flash', function(flash) {
   // handle server-side form validation errors.
   return {
@@ -123,13 +139,39 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
 
 }]);
 
+openspending.controller('datasetListCrl', ['$scope', 'OSAPIservice', '$location', 
+  function($scope, OSAPIservice, $location) {
+
+    $scope.datasets = [];
+    OSAPIservice.getDatasets({'fields':"name,label",
+                              'getsources': true})
+    .success(function (response) {
+      $scope.datasets = response;
+    });
+
+    $scope.newDatasource = function(){
+      $location.path("dataform");
+    };
+
+}]);
+
+
 
 openspending.config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
-  $urlRouterProvider.otherwise( '/dataform' );
+  $urlRouterProvider.otherwise( '/datasetlist' );
 });
 
 openspending.config(function OSStateProvider( $stateProvider ) {
-  $stateProvider.state( 'datasetmanager', {
+  $stateProvider.state('datasetlist', {
+    url: '/datasetlist',
+    views: {
+      "main": {
+        controller: 'datasetListCrl',
+        templateUrl: 'templates/dataset-list.tpl.html'
+      }
+    }
+  })
+  .state('datasetmanager', {
     url: '/:name/manage',
     views: {
       "main": {

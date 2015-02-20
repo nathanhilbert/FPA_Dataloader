@@ -1,0 +1,55 @@
+  <div ng-controller="ModelerCtrl">
+    <h1>Source Meta</h1>
+    <h2 style="color:green" ng-show="metavalid">All's good here</h2>
+    <form class="form-horizontal" name="form">
+      <div class="form-group" ng-class="{'has-error': form.label.$invalid}">
+        <label for="label" class="col-sm-2 control-label">
+          Source Name
+        </label>
+        <div class="col-sm-10">
+          <input name="label" ng-model="meta.name" class="form-control"
+            placeholder="My Dataset">
+          <p class="help-block" ng-show="form.label.$invalid"
+            ng-bind="form.label.$message"></p>
+        </div>
+      </div>
+      <div class="form-group" ng-class="{'has-error': form.label.$invalid}">
+        <label for="label" class="col-sm-2 control-label">
+          Target URL (changes reload stuff here)
+        </label>
+        <div class="col-sm-10">
+          <input name="label" ng-model="meta.url" class="form-control"
+            placeholder="My Dataset">
+          <p class="help-block" ng-show="form.label.$invalid"
+            ng-bind="form.label.$message"></p>
+        </div>
+      </div>
+      <button type="submit" ng-click="save_meta()" class="btn btn-success" ng-hide="sourceexists">
+        Save
+      </button>
+      <button type="submit" ng-click="save_meta_default()" class="btn btn-success">
+        Use default org
+      </button>
+      <div>
+        <h2>Things for the future</h2>
+        <ul>
+          <li>Tagging</li>
+        </ul>
+      </div>
+    </form>
+
+    <h1>PreFunctions</h1>
+      <div ng-show="metavalid">
+        <div>Prefunc options go here</div>
+        <div>Changing this reloads stuff</div>
+      </div>
+
+    <h1>ORstuff</h1>
+      <div>OpenRefine Stuff goes here</div>
+
+
+    <h1>Model stuff</h1>
+      <div>modeler goes here with the reqs</div>
+
+
+  </div>

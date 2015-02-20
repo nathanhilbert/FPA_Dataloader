@@ -1,5 +1,5 @@
 
-var openspending = angular.module('openspending', ['templates-app','templates-common', 'ngCookies', 'ui.router', 'ui.bootstrap', 'localytics.directives']);
+var openspending = angular.module('openspending', ['templates-app','templates-common', 'ngCookies', 'ui.router', 'ui.bootstrap', 'localytics.directives', 'openspending.modeler']);
 
 
 openspending.controller('AppCtrl', ['$scope', '$location', '$http', '$cookies', '$window', '$sce', 'flash',
@@ -113,8 +113,8 @@ openspending.factory('referenceData', ['$http', function($http) {
 }]);
 
 
-openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$location', 'referenceData', 'validation',
-  function($scope, $http, $window, $location, referenceData, validation) {
+openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$location', '$stateParams', 'referenceData', 'validation',
+  function($scope, $http, $window, $location, $stateParams, referenceData, validation) {
   /* This controller is not activated via routing, but explicitly through the 
   dataset.new flask route. */
   
@@ -126,6 +126,76 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
     $scope.reference = reference;
   });
 
+
+
+  if ($stateParams.datasetname){
+    //get dataset info and update the scope
+    //checks permission as well
+    $http.get('/api/3/datasets/' + $stateParams.datasetname)
+      .then(function(res){
+
+        $scope.dataset = res.data;
+        //need to add in error catch here
+        $scope.canCreate = true;
+        $scope.save = function(form) {
+          var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname, $scope.dataset);
+          dfd.then(function(res) {
+            //$location.path('/' + res.data.name + '/manage/meta');
+            if (res.data.Success === true){
+              //flash message
+              console.log("saved");
+              $location.path('/datasetlist');
+            }
+            else{
+              //error message
+            }
+          }, validation.handle(form));
+        };
+      });
+
+  }
+  else{
+    $http.get('/api/2/permissions?dataset=new').then(function(res) {
+      $scope.canCreate = res.data.create;
+    });
+    $scope.save = function(form) {
+      var dfd = $http.post('/api/3/datasets', $scope.dataset);
+      dfd.then(function(res) {
+        $location.path('/' + res.data.name + '/manage/meta');
+      }, validation.handle(form));
+    };
+  }
+
+}]);
+
+openspending.controller('SourceFormCtrl', ['$scope', '$http', '$window', '$location', '$stateParams', 'referenceData', 'validation',
+  function($scope, $http, $window, $location, $stateParams, referenceData, validation) {
+    // if $stateProvider.sourcename then populate with data
+    // muse have $stateProvider.dataset as dataset name
+
+    $scope.canCreate = false;
+    $scope.reference = {'frequpdate' : [
+        {'code': 'never', 'label': 'Never'},
+        {'code': 'daily', 'label': 'Daily'},
+        {'code': 'weekly', 'label': 'Weekly'},
+        {'code': 'monthly', 'label': 'Monthly'}
+        ]
+      };
+
+    $scope.source = {"label":null, "url": null, "frequpdate":null};
+
+    if (! $stateParams.sourcename){
+      //check that user has permission
+      $http.get('/api/3/permissions?dataset=new').then(function(res) {
+        $scope.canCreate = res.data.create;
+      }); 
+    }
+    else{
+      //populate the form with a call
+    }
+
+
+
   $scope.save = function(form) {
     var dfd = $http.post('/api/3/datasets', $scope.dataset);
     dfd.then(function(res) {
@@ -133,9 +203,8 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
     }, validation.handle(form));
   };
 
-  $http.get('/api/2/permissions?dataset=new').then(function(res) {
-    $scope.canCreate = res.data.create;
-  });
+// can check this as we
+
 
 }]);
 
@@ -171,29 +240,22 @@ openspending.config(function OSStateProvider( $stateProvider ) {
       }
     }
   })
-  .state('datasetmanager', {
-    url: '/:name/manage',
-    views: {
-      "main": {
-        //controller: 'DatamanagerCrl',
-        templateUrl: 'templates/dataset_manage.tpl.html'
-      }
-    }
-  })
-  .state('datasetmeta', {
-    url: '/:name/manage/meta',
-    views: {
-      "main": {
-        //controller: 'CubeOptionsCtrl',
-        templateUrl: 'templates/dataset_meta.tpl.html'
-      }
-    }
-  })
+  //create a new dataset  
   .state('dataform', {
     url: '/dataform',
     views: {
       "main": {
         //controller: 'CubeOptionsCtrl',
+        templateUrl: 'templates/data_form.tpl.html'
+      }
+    }
+  })
+  //manage an existing dataset
+  .state('dataform_edit', {
+    url: '/:datasetname/manage',
+    views: {
+      "main": {
+        //controller: 'DatamanagerCrl',
         templateUrl: 'templates/data_form.tpl.html'
       }
     }

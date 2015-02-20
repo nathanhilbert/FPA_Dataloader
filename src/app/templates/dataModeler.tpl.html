@@ -1,0 +1,16 @@
+
+<div class="form-group" ng-repeat="(columnkey, columnvalue) in modeler">
+  <h4>{{ columnkey }}</h4>
+  <input type="text" placeholder="label" ng-model="columnvalue.label"/>
+  <div class="col-sm-10">
+    <select chosen class="form-control"
+      ng-model="columnvalue.column"
+      ng-options="c.code as c.label for c in reference.datacolumns">
+    </select>
+  <input type="text" placeholder="descrotpion" ng-model="columnvalue.description"/>
+    <p class="help-block" ng-show="form.currency.$invalid"
+      ng-bind="form.currency.$message"></p>
+  </div>
+</div>
+
+

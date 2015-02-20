@@ -4,7 +4,7 @@ var modeler = angular.module( 'openspending.modeler', [
 
 modeler.config(function config( $stateProvider ) {
   $stateProvider.state('sourceform', {
-    url: '/:dataset/source',
+    url: '/:datasetname/source',
     views: {
       "main": {
         //controller: 'CubeOptionsCtrl',
@@ -14,7 +14,7 @@ modeler.config(function config( $stateProvider ) {
   })
   //edit an existing indicator form
   .state('sourceform_edit', {
-    url: '/:dataset/source/:sourcename',
+    url: '/:datasetname/source/:sourcename',
     views: {
       "main": {
         //controller: 'CubeOptionsCtrl',
@@ -26,6 +26,14 @@ modeler.config(function config( $stateProvider ) {
 
 modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, validation ) {
 
+  //placeholder for options should be done in the Flask template
+  $scope.reference = {"prefuncoptions" : [{
+      "code": "json_to_csv", "label": "JSON to CSV"
+    },
+    {
+      "code": "parse_xml_to_csv", "label": "XML to CSV"
+    }]
+  };
 
 
   if ($stateParams.sourcename){
@@ -38,6 +46,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           console.log(res.data);
           $scope.sourceexists = true;
           $scope.metavalid = true;
+          $scope.dataloaded = true;
         }
         else{
           console.log("there was an error try again");
@@ -50,10 +59,6 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
     $scope.sourceexists = false;
     // we creating a new one
 
-      //let's populate everything with the defaults of the dataset model if they exist
-
-
-      //$http.get('/api/3/datasets/' + $stateParams.datasetname + "/model");
 
   }
 
@@ -72,6 +77,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           //flash message
           $scope.sourceexists = true;
           $scope.metavalid = true;
+          $scope.dataloaded = true;
 
         }
         else{
@@ -82,6 +88,72 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
     };
 
 
+/*modeler stuff here*/
+  $scope.modeler = {"country_level0": {"column":null, "label":null, "description":null},
+                    "time": {"column":null, "label":null, "description":null},
+                    "indicatorvalue": {"column":null, "label":null, "description":null}
+                    };
+
+  $scope.$watch('modeler', function(newValue, oldValue) {
+    console.log("value changes");
+  });
+  //check if meta has data
+  $scope.reference.datacolumns = [{"label": "somethinhg", "code": "somethinhg"}, {"code":"something2", "label":"something2"}];
+
 
 
 });
+
+// not really necessary
+// could do an src include instead
+modeler.directive('openRefine', function () {
+        return {
+          restrict: 'A',
+          templateUrl: 'templates/openrefine.tpl.html'
+          //transclude: true,
+          // link: function postLink(scope, element, attrs) {
+
+          // }
+        };
+      });
+
+modeler.directive('openRefineFetch', function ($http) {
+        return {
+          restrict: 'A',
+          template: '<button>Fetch OR Instructions</button>',
+          //transclude: true,
+          link: function postLink(scope, element, attrs) {
+         
+            // //taking the same scope as parent
+            element.on("click", function () {
+              if (scope.meta.ORid){
+                $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name + '/ORoperations')
+                  .then(function(res){
+                    if (res.data){
+                      scope.meta.ORoperations = angular.toJson(res.data);
+                    }
+                    else{
+                      console.log("error in getting the openrefine");
+                    }
+
+                  });
+              }
+            });
+
+          }
+        };
+      });
+
+modeler.directive('modelerData', function () {
+        return {
+          restrict: 'A',
+          templateUrl: 'templates/dataModeler.tpl.html'
+          //transclude: true,
+          // link: function postLink(scope, element, attrs) {
+          //   //get 
+
+          // }
+        };
+      });
+
+

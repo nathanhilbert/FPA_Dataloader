@@ -40,16 +40,31 @@
 
     <h1>PreFunctions</h1>
       <div ng-show="metavalid">
-        <div>Prefunc options go here</div>
-        <div>Changing this reloads stuff</div>
+          <div class="form-group" ng-class="{'has-error': form.category.$invalid}">
+            <label for="category" class="col-sm-2 control-label">
+              Category
+            </label>
+            <div class="col-sm-10">
+              <select name="category" chosen class="form-control"
+                ng-model="meta.prefuncs" disable-search="true"
+                ng-options="c.code as c.label for c in reference.prefuncoptions" multiple>
+              </select>
+              <p class="help-block" ng-show="form.category.$invalid"
+                ng-bind="form.category.$message"></p>
+            </div>
+          </div>
       </div>
 
     <h1>ORstuff</h1>
-      <div>OpenRefine Stuff goes here</div>
+      <div ng-show="metavalid">
+        <div open-refine>OpenRefine</div>
+      </div>
 
 
     <h1>Model stuff</h1>
-      <div>modeler goes here with the reqs</div>
+      <div ng-show="dataloaded && metavalid">
+        <div modeler-data>modeler goes here with the reqs</div>
+      </div>
 
 
   </div>

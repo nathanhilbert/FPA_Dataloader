@@ -24,7 +24,7 @@ modeler.config(function config( $stateProvider ) {
   });
 });
 
-modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, validation ) {
+modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, $compile, validation ) {
 
   //placeholder for options should be done in the Flask template
   $scope.reference = {"prefuncoptions" : [{
@@ -47,6 +47,11 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
+          $(".model-columns").html(
+            $compile(
+              "<div class='modeler-choices' modeler-data></div>"
+            )($scope)
+          );
         }
         else{
           console.log("there was an error try again");
@@ -78,6 +83,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
+          $(".model-columns").append("<div modeler-data></div>");
 
         }
         else{
@@ -86,19 +92,6 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
         }
       });
     };
-
-
-/*modeler stuff here*/
-  $scope.modeler = {"country_level0": {"column":null, "label":null, "description":null},
-                    "time": {"column":null, "label":null, "description":null},
-                    "indicatorvalue": {"column":null, "label":null, "description":null}
-                    };
-
-  $scope.$watch('modeler', function(newValue, oldValue) {
-    console.log("value changes");
-  });
-  //check if meta has data
-  $scope.reference.datacolumns = [{"label": "somethinhg", "code": "somethinhg"}, {"code":"something2", "label":"something2"}];
 
 
 
@@ -144,16 +137,102 @@ modeler.directive('openRefineFetch', function ($http) {
         };
       });
 
-modeler.directive('modelerData', function () {
+
+
+var globalness = null;
+
+
+modeler.directive('modelerData', function ($http) {
         return {
           restrict: 'A',
-          templateUrl: 'templates/dataModeler.tpl.html'
+          templateUrl: 'templates/dataModeler.tpl.html',
           //transclude: true,
-          // link: function postLink(scope, element, attrs) {
-          //   //get 
+          link: function postLink(scope, element, attrs) {
+            console.log("did this");
+            if (!scope.meta){
+              console.log("there was an error");
+              return;
+            }
 
-          // }
+            globalness = scope;
+
+            $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name + '/fields')
+              .then(function(res){
+                if (res.data){
+                  var tempcolumns = [];
+                  jQuery.each(res.data, function(i,columnval){
+                    console.log(columnval);
+                    tempcolumns.push({"label":columnval, "code":columnval});
+                  });
+
+                  scope.reference.datacolumns = tempcolumns;
+
+                              /*modeler stuff here*/
+                  scope.modeler = {"country_level0": {"column":null, "label":null, "description":null},
+                                    "time": {"column":null, "label":null, "description":null},
+                                    "indicatorvalue": {"column":null, "label":null, "description":null}
+                                    };
+                }
+                else{
+                  console.log("error in getting the openrefine");
+                }
+
+              });
+          }
         };
       });
 
+
+
+var fielchecker = null;
+
+modeler.directive('modelFieldChecker', function($http){
+        return {
+          restrict: 'A',
+          template: '<button>Check me</button><div style="color:red">{{message}}</div>',
+          scope: false,
+          link: function postLink(scope, element, attrs) {
+            scope.message = "No Message";
+            // wires are here for long polling
+              fielchecker = scope;
+              scope.columnkey = attrs['columname'];
+
+              //scope.polling = false;
+              // if (attrs['columnkey'] == "country_level0" || attrs['columnkey'] == "time"){
+
+              //   //enter the checker
+              // }
+              // else{
+              //   console.log("check is not used for these fields.. should hide them");
+              // }
+              element.on("click", function () {
+                // var poller = function() {
+                //   $http.get('/api/3/datasets/' + scope.$parent.meta.dataset + '/model/' + scope.$parent.meta.name + '/fieldcheck/' + scope.columnkey).then(function(res) {
+                //     console.log(res);
+                //     if (! scope.polling ){
+                //       $timeout(poller, 2000);
+                //     }
+                //     //if something
+                //   });      
+                // };
+                $http.post('/api/3/datasets/' + scope.$parent.meta.dataset + '/model/' + scope.$parent.meta.name + '/fieldcheck/' + scope.columnkey, 
+                      {"columnval": scope.columnvalue.column})
+                      .then(function(res) {
+                        if (res.data.Success){
+                          scope.message = "everything is ok";
+                        }
+                        else{
+                          scope.message = res.data.message + res.data.errors;
+                        }
+                          //scope.polling = false;
+                          //when this comes back turn off
+
+                        });  
+                //poller();
+
+              });
+
+          }
+        };
+});
 

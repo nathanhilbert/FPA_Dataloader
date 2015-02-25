@@ -26,11 +26,13 @@
                 **Add New Source***
             </a>
             <div class="list-source-group">
-                <a class="list-source-item"
-                    ng-repeat="source in dataset.sources"
-                    href="#/{{dataset.name}}/source/{{source.name}}">
-                        -- {{source.label || source.name}} <small>({{source.name || "no name"}})</small>
-                </a>  
+                <div ng-repeat="source in dataset.sources">
+                    <a class="list-source-item"
+                        href="#/{{dataset.name}}/source/{{source.name}}">
+                            -- {{source.label || source.name}} <small>({{source.name || "no name"}})</small> </a>
+                            <button ng-click='deleteSource(dataset.name,source.name)'>Delete</button>
+                    <br /> 
+                </div>
 
             </div>
     </div>

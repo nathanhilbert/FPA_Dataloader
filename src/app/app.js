@@ -208,8 +208,8 @@ openspending.controller('SourceFormCtrl', ['$scope', '$http', '$window', '$locat
 
 }]);
 
-openspending.controller('datasetListCrl', ['$scope', 'OSAPIservice', '$location', 
-  function($scope, OSAPIservice, $location) {
+openspending.controller('datasetListCrl', ['$scope', '$http', 'OSAPIservice', '$location', 
+  function($scope, $http, OSAPIservice, $location) {
 
     $scope.datasets = [];
     OSAPIservice.getDatasets({'fields':"name,label",
@@ -217,6 +217,25 @@ openspending.controller('datasetListCrl', ['$scope', 'OSAPIservice', '$location'
     .success(function (response) {
       $scope.datasets = response;
     });
+
+    $scope.deleteSource = function(datasetname, sourcename){
+      //delete is a reserved word
+      console.log(datasetname);
+      console.log(sourcename);
+      var req = {
+       method: 'DELETE',
+       url: '/api/3/datasets/' + datasetname + '/sources/' + sourcename
+      };
+
+      $http(req)
+      .then(function(res){
+        if (res.data){
+          $scope.datasets = res.data;
+        }
+        //remove it from the set or rerun dataListCrl
+      });
+
+    };
 
     $scope.newDatasource = function(){
       $location.path("dataform");

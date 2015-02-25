@@ -39,11 +39,9 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
   if ($stateParams.sourcename){
     $http.get('/api/3/datasets/' + $stateParams.datasetname + '/model/' + $stateParams.sourcename)
       .then(function(res){
-        console.log(res);
         if (res.data){
           $scope.meta = res.data;
           //populate the rest of the data if it exists
-          console.log(res.data);
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
@@ -78,13 +76,18 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
       var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname + '/model' , $scope.meta);
       dfd.then(function(res) {
         //$location.path('/' + res.data.name + '/manage/meta');
-        if (res.data.Success === true){
-          //flash message
+        if (res.data){
+          $scope.meta = res.data;
+          //populate the rest of the data if it exists
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
-          $(".model-columns").append("<div modeler-data></div>");
-
+          $location.path("/" + $scope.meta.dataset + "/source/" + $scope.meta.name);
+          $(".model-columns").html(
+            $compile(
+              "<div class='modeler-choices' modeler-data></div>"
+            )($scope)
+          );
         }
         else{
           //error message
@@ -124,6 +127,7 @@ modeler.directive('openRefineFetch', function ($http) {
                   .then(function(res){
                     if (res.data){
                       scope.meta.ORoperations = angular.toJson(res.data);
+                      scope.updateModel();
                     }
                     else{
                       console.log("error in getting the openrefine");
@@ -156,28 +160,25 @@ modeler.directive('modelerData', function ($http) {
 
             globalness = scope;
 
-            $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name + '/fields')
-              .then(function(res){
-                if (res.data){
-                  var tempcolumns = [];
-                  jQuery.each(res.data, function(i,columnval){
-                    console.log(columnval);
-                    tempcolumns.push({"label":columnval, "code":columnval});
-                  });
+            scope.updateModel = function(){
+                $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name + '/fields')
+                .then(function(res){
+                  if (res.data){
+                    var tempcolumns = [];
+                    jQuery.each(res.data.columns, function(i,columnval){
+                      tempcolumns.push({"label":columnval, "code":columnval});
+                    });
+                    scope.reference.datacolumns = tempcolumns;
 
-                  scope.reference.datacolumns = tempcolumns;
+                    scope.modeler = res.data.modeler;
+                  }
+                  else{
+                    console.log("error in getting the openrefine");
+                  }
 
-                              /*modeler stuff here*/
-                  scope.modeler = {"country_level0": {"column":null, "label":null, "description":null},
-                                    "time": {"column":null, "label":null, "description":null},
-                                    "indicatorvalue": {"column":null, "label":null, "description":null}
-                                    };
-                }
-                else{
-                  console.log("error in getting the openrefine");
-                }
-
-              });
+                });
+            };
+            scope.updateModel();
           }
         };
       });
@@ -192,7 +193,7 @@ modeler.directive('modelFieldChecker', function($http){
           template: '<button>Check me</button><div style="color:red">{{message}}</div>',
           scope: false,
           link: function postLink(scope, element, attrs) {
-            scope.message = "No Message";
+            scope.message = "";
             // wires are here for long polling
               fielchecker = scope;
               scope.columnkey = attrs['columname'];
@@ -236,3 +237,35 @@ modeler.directive('modelFieldChecker', function($http){
         };
 });
 
+
+
+modeler.directive('modelSubmit', function ($http) {
+        return {
+          restrict: 'A',
+          template: '<div style="red">{{ submitmessage }}</div><button>Submit Model</button>',
+          //transclude: true,
+          link: function postLink(scope, element, attrs) {
+            scope.submitmessage = "";
+         
+            // //taking the same scope as parent
+            element.on("click", function () {
+              //validate that everything is there any ready to go with the column names
+                $http.post('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name, 
+                      {"meta": scope.meta, "modeler": scope.modeler})
+                      .then(function(res) {
+                        if (res.data.Success){
+                          scope.submitmessage = "everything is ok";
+                        }
+                        else{
+                          scope.submitmessage = res.data.message + res.data.errors;
+                        }
+                          //scope.polling = false;
+                          //when this comes back turn off
+
+                        });  
+
+            });
+
+          }
+        };
+      });

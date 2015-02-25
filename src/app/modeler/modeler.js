@@ -97,7 +97,31 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
       });
     };
 
-    $scope.loadsuccess = false;
+  $scope.apply_meta_default = function(){
+      var dfd = $http.get('/api/3/datasets/' + $stateParams.datasetname + '/applymodel/' + $scope.meta.name );
+      dfd.then(function(res){
+        if(res.data){
+          $scope.meta = res.data;
+          //populate the rest of the data if it exists
+          $scope.sourceexists = true;
+          $scope.metavalid = true;
+          $scope.dataloaded = true;
+          $location.path("/" + $scope.meta.dataset + "/source/" + $scope.meta.name);
+          $(".model-columns").html(
+            $compile(
+              "<div class='modeler-choices' modeler-data></div>"
+            )($scope)
+          );
+        }
+        else{
+          console.log(res);
+        }
+      });
+
+    //need to return meta and the other
+  };
+
+  $scope.loadsuccess = false;
 
 
 
@@ -155,7 +179,6 @@ modeler.directive('modelerData', function ($http) {
           templateUrl: 'templates/dataModeler.tpl.html',
           //transclude: true,
           link: function postLink(scope, element, attrs) {
-            console.log("did this");
             if (!scope.meta){
               console.log("there was an error");
               return;
@@ -279,22 +302,22 @@ modeler.directive('modelSubmit', function ($http) {
 modeler.directive('modelOrgSubmit', function ($http) {
         return {
           restrict: 'A',
-          template: '<div style="red">{{ submitmessage }}</div><button>Save as Default for Org</button>',
+          template: '<div style="red">{{ orgmessage }}</div><button>Save as Default for Org</button>',
           //transclude: true,
           link: function postLink(scope, element, attrs) {
-            scope.submitmessage = "";
+            scope.orgmessage = "";
          
             // //taking the same scope as parent
             element.on("click", function () {
               //validate that everything is there any ready to go with the column names
-                $http.post('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name, 
+                $http.post('/api/3/datasets/' + scope.meta.dataset + '/applymodel/' + scope.meta.name, 
                       {"meta": scope.meta, "modeler": scope.modeler})
                       .then(function(res) {
                         if (res.data.Success){
-                          scope.submitmessage = "everything is ok";
+                          scope.orgmessage = "everything is ok";
                         }
                         else{
-                          scope.submitmessage = res.data.message + res.data.errors;
+                          scope.orgmessage = res.data.message + res.data.errors;
                         }
                           //scope.polling = false;
                           //when this comes back turn off

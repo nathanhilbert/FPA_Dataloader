@@ -220,8 +220,6 @@ openspending.controller('datasetListCrl', ['$scope', '$http', 'OSAPIservice', '$
 
     $scope.deleteSource = function(datasetname, sourcename){
       //delete is a reserved word
-      console.log(datasetname);
-      console.log(sourcename);
       var req = {
        method: 'DELETE',
        url: '/api/3/datasets/' + datasetname + '/sources/' + sourcename

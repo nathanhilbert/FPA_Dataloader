@@ -66,6 +66,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
   }
 
 
+
   $scope.save_meta = function() {
 
     // form validation
@@ -95,6 +96,8 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
         }
       });
     };
+
+    $scope.loadsuccess = false;
 
 
 
@@ -220,7 +223,8 @@ modeler.directive('modelFieldChecker', function($http){
                       {"columnval": scope.columnvalue.column})
                       .then(function(res) {
                         if (res.data.Success){
-                          scope.message = "everything is ok";
+                          scope.loadsuccess = true;
+                          scope.message = "Data is now loaded";
                         }
                         else{
                           scope.message = res.data.message + res.data.errors;
@@ -243,6 +247,39 @@ modeler.directive('modelSubmit', function ($http) {
         return {
           restrict: 'A',
           template: '<div style="red">{{ submitmessage }}</div><button>Submit Model</button>',
+          //transclude: true,
+          link: function postLink(scope, element, attrs) {
+            scope.submitmessage = "";
+         
+            // //taking the same scope as parent
+            element.on("click", function () {
+              //validate that everything is there any ready to go with the column names
+                $http.post('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name, 
+                      {"meta": scope.meta, "modeler": scope.modeler})
+                      .then(function(res) {
+                        if (res.data.Success){
+                          scope.submitmessage = "everything is ok";
+                          scope.loadsuccess = true;
+                        }
+                        else{
+                          scope.submitmessage = res.data.message + res.data.errors;
+                        }
+                          //scope.polling = false;
+                          //when this comes back turn off
+
+                        });  
+
+            });
+
+          }
+        };
+      });
+
+
+modeler.directive('modelOrgSubmit', function ($http) {
+        return {
+          restrict: 'A',
+          template: '<div style="red">{{ submitmessage }}</div><button>Save as Default for Org</button>',
           //transclude: true,
           link: function postLink(scope, element, attrs) {
             scope.submitmessage = "";

@@ -28,7 +28,7 @@
         Save
       </button>
       <button type="submit" ng-click="save_meta_default()" class="btn btn-success">
-        Use default org
+        Apply Default From Org
       </button>
       <div>
         <h2>Things for the future</h2>
@@ -69,6 +69,8 @@
     <br />
     <br />
     <div model-submit ng-show="dataloaded && metavalid"></div>
+
+    <div model-org-submit ng-show="loadsuccess"></div>
 
 
   </div>

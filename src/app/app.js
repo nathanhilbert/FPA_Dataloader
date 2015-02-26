@@ -119,7 +119,7 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
   dataset.new flask route. */
   
   $scope.reference = {};
-  $scope.canCreate = false;
+  $scope.permissions = {"create":false};
   $scope.dataset = {'category': 'budget', 'territories': []};
 
   referenceData.get(function(reference) {
@@ -156,7 +156,7 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
   }
   else{
     $http.get('/api/2/permissions?dataset=new').then(function(res) {
-      $scope.canCreate = res.data.create;
+      $scope.permissions = res.data;
     });
     $scope.save = function(form) {
       var dfd = $http.post('/api/3/datasets', $scope.dataset);
@@ -173,7 +173,7 @@ openspending.controller('SourceFormCtrl', ['$scope', '$http', '$window', '$locat
     // if $stateProvider.sourcename then populate with data
     // muse have $stateProvider.dataset as dataset name
 
-    $scope.canCreate = false;
+    $scope.permissions = {"create" : false};
     $scope.reference = {'frequpdate' : [
         {'code': 'never', 'label': 'Never'},
         {'code': 'daily', 'label': 'Daily'},
@@ -187,7 +187,7 @@ openspending.controller('SourceFormCtrl', ['$scope', '$http', '$window', '$locat
     if (! $stateParams.sourcename){
       //check that user has permission
       $http.get('/api/3/permissions?dataset=new').then(function(res) {
-        $scope.canCreate = res.data.create;
+        $scope.permissions = res.data;
       }); 
     }
     else{

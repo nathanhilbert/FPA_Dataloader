@@ -1,7 +1,7 @@
   <div ng-controller="SourceFormCtrl">
     
     <!-- templates/dataset/new.html content -->
-    <div class="row" ng-show="canCreate">
+    <div class="row" ng-show="permissions.create">
       <div class="col-md-8 dataset-info">
         <form class="form-horizontal" name="form" ng-submit="save(form)">
           <div class="form-group" ng-class="{'has-error': form.label.$invalid}">

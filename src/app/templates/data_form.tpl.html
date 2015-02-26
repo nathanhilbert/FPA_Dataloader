@@ -1,6 +1,6 @@
   <div ng-controller="DatasetNewCtrl">
     <!-- templates/dataset/new_cta.html content -->
-    <div class="row" ng-hide="canCreate">
+    <div class="row" ng-hide="permissions.create">
       <div class="col-md-6">
         Let's do some nice ETL for this
       </div>
@@ -28,7 +28,7 @@
     </div>
     
     <!-- templates/dataset/new.html content -->
-    <div class="row" ng-show="canCreate">
+    <div class="row" ng-show="permissions.create">
       <div class="col-md-4">
         <div class="alert alert-info">
           <p>

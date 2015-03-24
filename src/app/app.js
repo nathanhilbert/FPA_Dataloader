@@ -134,9 +134,11 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
     $http.get('/api/3/datasets/' + $stateParams.datasetname)
       .then(function(res){
 
+        //error handling
+
         $scope.dataset = res.data;
         //need to add in error catch here
-        $scope.canCreate = true;
+        $scope.permissions.create = true;
         $scope.save = function(form) {
           var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname, $scope.dataset);
           dfd.then(function(res) {

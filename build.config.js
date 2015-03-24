@@ -72,7 +72,8 @@ module.exports = {
       'vendor/angular-ui-utils/modules/route/route.js',
       'vendor/angular-cookies/angular-cookies.min.js',
       'vendor/jquery/dist/jquery.min.js',
-      'vendor/angular-chosen-localytics/chosen.js'
+      'vendor/angular-chosen-localytics/chosen.js',
+      'vendor/angular-upload/angular-upload.min.js'
     ],
     css: [
       'vendor/angular-chosen-localytics/chosen-spinner.css'

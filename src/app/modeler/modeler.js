@@ -1,5 +1,6 @@
 var modeler = angular.module( 'openspending.modeler', [
-  'ui.router'
+  'ui.router',
+  'lr.upload'
 ]);
 
 modeler.config(function config( $stateProvider ) {
@@ -24,7 +25,7 @@ modeler.config(function config( $stateProvider ) {
   });
 });
 
-modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, $compile, validation ) {
+modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, $compile, validation, upload ) {
 
   //placeholder for options should be done in the Flask template
   $scope.reference = {"prefuncoptions" : [{
@@ -35,7 +36,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
     }]
   };
 
-
+  /*get the source information from the API*/
   if ($stateParams.sourcename){
     $http.get('/api/3/datasets/' + $stateParams.datasetname + '/model/' + $stateParams.sourcename)
       .then(function(res){
@@ -72,10 +73,31 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
     // form validation
     //check that there are actually values
     //name must be unique
+    console.log($scope);
+    if ($scope.meta.sourcefile){
+      console.log($scope.meta.sourcefile);
+    }
+
+      upload({
+        url: '/upload',
+        method: 'POST',
+        data: {
+          anint: 123,
+          aFile: $scope.myFile // a jqLite type="file" element, upload() will extract all the files from the input and put them into the FormData object before sending.
+        }
+      }).then(
+        function (response) {
+          console.log(response.data); // will output whatever you choose to return from the server on a successful upload
+        },
+        function (response) {
+            console.error(response); //  Will return if status code is above 200 and lower than 300, same as $http
+        }
+      );
 
       //create a new one
       var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname + '/model' , $scope.meta);
       dfd.then(function(res) {
+
         //$location.path('/' + res.data.name + '/manage/meta');
         if (res.data){
           $scope.meta = res.data;

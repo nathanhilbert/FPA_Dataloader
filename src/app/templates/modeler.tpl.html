@@ -23,6 +23,12 @@
           <p class="help-block" ng-show="form.label.$invalid"
             ng-bind="form.label.$message"></p>
         </div>
+        <h1>OR</h1>
+        <div class="col-sm-10">
+          <input name="sourcefile" class="form-control" type="file" />
+          <p class="help-block" ng-show="form.label.$invalid"
+            ng-bind="form.label.$message"></p>
+        </div>
       </div>
       <button type="submit" ng-click="save_meta()" class="btn btn-success" ng-hide="sourceexists">
         Save

@@ -212,8 +212,7 @@ openspending.controller('datasetListCrl', ['$scope', '$http', 'OSAPIservice', '$
   function($scope, $http, OSAPIservice, $location) {
 
     $scope.datasets = [];
-    OSAPIservice.getDatasets({'fields':"name,label",
-                              'getsources': true})
+    OSAPIservice.getDatasets({'fields':"name,label"})
     .success(function (response) {
       $scope.datasets = response;
     });

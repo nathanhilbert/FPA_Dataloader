@@ -73,7 +73,6 @@ openspending.factory('validation', ['flash', function(flash) {
       return function(res) {
         if (res.status == 400 || !form) {
             var errors = [];
-            console.log(res.data.errors);
             for (var field in res.data.errors) {
                 form[field].$setValidity('value', false);
                 form[field].$message = res.data.errors[field];
@@ -120,11 +119,48 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
   
   $scope.reference = {};
   $scope.permissions = {"create":false};
-  $scope.dataset = {'category': 'budget', 'territories': []};
+  $scope.dataset = {};
+  $scope.errors = [];
 
   referenceData.get(function(reference) {
     $scope.reference = reference;
   });
+
+  var saveExistingDataSet = function(form) {
+                          //validate this for the dataorg can be set later anyway?
+
+                          var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname, $scope.dataset);
+                          dfd.then(function(res) {
+                            //$location.path('/' + res.data.name + '/manage/meta');
+                            if (res.data.Success === true){
+                              //flash message
+                              $location.path('/datasetlist');
+                            }
+                            else{
+                              $scope.errors = res.data.errors;
+                              // maybe set error here
+                              //error message
+                            }
+                          }, validation.handle(form));
+                        };
+
+  var saveNewDataSet = function(form) {
+                        var dfd = $http.post('/api/3/datasets', $scope.dataset);
+                        dfd.then(function(res) {
+                            if (res.data.success === true){
+                              //flash message
+                              $location.path('/datasetlist');
+                            }
+                            else{
+                              $scope.errors = res.data.errors;
+                              // maybe set error here
+                              //error message
+                            }
+
+                          //$location.path('/' + res.data.name + '/manage/meta');
+
+                        }, validation.handle(form));
+                      };
 
 
 
@@ -139,20 +175,10 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
         $scope.dataset = res.data;
         //need to add in error catch here
         $scope.permissions.create = true;
-        $scope.save = function(form) {
-          var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname, $scope.dataset);
-          dfd.then(function(res) {
-            //$location.path('/' + res.data.name + '/manage/meta');
-            if (res.data.Success === true){
-              //flash message
-              console.log("saved");
-              $location.path('/datasetlist');
-            }
-            else{
-              //error message
-            }
-          }, validation.handle(form));
-        };
+
+
+        $scope.save = saveExistingDataSet;
+
       });
 
   }
@@ -160,12 +186,7 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
     $http.get('/api/2/permissions?dataset=new').then(function(res) {
       $scope.permissions = res.data;
     });
-    $scope.save = function(form) {
-      var dfd = $http.post('/api/3/datasets', $scope.dataset);
-      dfd.then(function(res) {
-        $location.path('/' + res.data.name + '/manage/meta');
-      }, validation.handle(form));
-    };
+    $scope.save = saveNewDataSet;
   }
 
 }]);

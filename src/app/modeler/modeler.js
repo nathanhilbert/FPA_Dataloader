@@ -1,6 +1,5 @@
 var modeler = angular.module( 'openspending.modeler', [
-  'ui.router',
-  'lr.upload'
+  'ui.router'
 ]);
 
 modeler.config(function config( $stateProvider ) {
@@ -25,7 +24,7 @@ modeler.config(function config( $stateProvider ) {
   });
 });
 
-modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, $compile, validation, upload ) {
+modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, $compile, validation) {
 
   //placeholder for options should be done in the Flask template
   $scope.reference = {"prefuncoptions" : [{
@@ -70,34 +69,8 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
 
   $scope.save_meta = function() {
 
-    // form validation
-    //check that there are actually values
-    //name must be unique
-    console.log($scope);
-    if ($scope.meta.sourcefile){
-      console.log($scope.meta.sourcefile);
-    }
 
-      upload({
-        url: '/upload',
-        method: 'POST',
-        data: {
-          anint: 123,
-          aFile: $scope.myFile // a jqLite type="file" element, upload() will extract all the files from the input and put them into the FormData object before sending.
-        }
-      }).then(
-        function (response) {
-          console.log(response.data); // will output whatever you choose to return from the server on a successful upload
-        },
-        function (response) {
-            console.error(response); //  Will return if status code is above 200 and lower than 300, same as $http
-        }
-      );
-
-      //create a new one
-      var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname + '/model' , $scope.meta);
-      dfd.then(function(res) {
-
+    var handleresponse = function(res) {
         //$location.path('/' + res.data.name + '/manage/meta');
         if (res.data){
           $scope.meta = res.data;
@@ -105,7 +78,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
-          $location.path("/" + $scope.meta.dataset + "/source/" + $scope.meta.name);
+          $location.path("/" + $scope.meta.dataset + "/source/" + $scope.meta.id);
           $(".model-columns").html(
             $compile(
               "<div class='modeler-choices' modeler-data></div>"
@@ -116,7 +89,56 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           //error message
           console.log(res);
         }
-      });
+      };
+
+    // form validation
+    //check that there are actually values
+    //name must be unique
+
+    if ($('#sourcefile')[0].files.length == 1){
+
+      //doesn't work in IE9 or less
+       var form_data = new FormData();
+       //only one file
+       form_data.append("sourcefile", $('#sourcefile')[0].files[0]);
+       form_data.append("name", $scope.meta.name);
+
+
+        $.ajax({
+            type: 'POST',
+            url: '/api/3/datasets/' + $stateParams.datasetname + '/model',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            async: false,
+            success: handleresponse
+        });
+    }
+    else if ($scope.meta.url !== ""){
+        $.ajax({
+            type: 'POST',
+            url: '/api/3/datasets/' + $stateParams.datasetname + '/model',
+            data: {'name': $scope.meta.name, 'url': $scope.meta.url},
+            contentType: false,
+            cache: false,
+            processData: false,
+            async: false,
+            success: handleresponse
+        });
+
+    }
+    else{
+      console.log("You must provide a URL or file");
+    }
+
+
+
+
+
+
+      //create a new one
+
     };
 
   $scope.apply_meta_default = function(){

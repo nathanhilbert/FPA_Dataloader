@@ -132,7 +132,7 @@ openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$locat
                           var dfd = $http.post('/api/3/datasets/' + $stateParams.datasetname, $scope.dataset);
                           dfd.then(function(res) {
                             //$location.path('/' + res.data.name + '/manage/meta');
-                            if (res.data.Success === true){
+                            if (res.data.success === true){
                               //flash message
                               $location.path('/datasetlist');
                             }

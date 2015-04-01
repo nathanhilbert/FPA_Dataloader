@@ -1,7 +1,7 @@
   <div ng-controller="ModelerCtrl">
     <h1>Source Meta</h1>
     <h2 style="color:green" ng-show="metavalid">All's good here</h2>
-    <form class="form-horizontal" name="form">
+    <form class="form-horizontal" name="form" method="post" enctype="multipart/form-data">
       <div class="form-group" ng-class="{'has-error': form.label.$invalid}">
         <label for="label" class="col-sm-2 control-label">
           Source Name
@@ -25,9 +25,10 @@
         </div>
         <h1>OR</h1>
         <div class="col-sm-10">
-          <input name="sourcefile" class="form-control" type="file" />
-          <p class="help-block" ng-show="form.label.$invalid"
-            ng-bind="form.label.$message"></p>
+            <label for="sourcefile">Select a file</label>
+            <input name="sourcefile" type="file" id="sourcefile">
+          <p class="help-block" ng-show="form.sourcefile.$invalid"
+            ng-bind="form.sourcefile.$message"></p>
         </div>
       </div>
       <button type="submit" ng-click="save_meta()" class="btn btn-success" ng-hide="sourceexists">

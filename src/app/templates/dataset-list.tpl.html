@@ -22,8 +22,12 @@
                 <small>({{dataset.name || "no name"}})</small>
             </a>
             <a class="list-group-item"
-                href="#/{{dataset.name}}/source">
-                **Add New Source***
+                href="#/{{dataset.name}}/source" ng-hide="dataset.has_data">
+                **Add Data***
+            </a>
+            <a class="list-group-item"
+                href="#/{{dataset.name}}/source" ng-show="dataset.has_data">
+                **Edit Data***
             </a>
             <div class="list-source-group">
                 <div ng-repeat="source in dataset.sources">

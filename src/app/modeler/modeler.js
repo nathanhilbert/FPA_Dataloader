@@ -28,6 +28,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
 
   //placeholder for options should be done in the Flask template
   $scope.reference = {"prefuncoptions" :[]};
+  $scope.meta = {};
 
   //get the preprocessors from the references
   $http.get('/api/3/preprocessors')
@@ -41,26 +42,24 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
 
   $http.get('/api/3/datasets/' + $stateParams.datasetname + '/model')
     .then(function(res){
-      if (res.data){
-        if (res.data === false){
-          $scope.sourceexists = false;
-        }
-        else{
-          $scope.meta = res.data;
-          //populate the rest of the data if it exists
-          $scope.sourceexists = true;
-          $scope.metavalid = true;
-          $scope.dataloaded = true;
-          $(".model-columns").html(
-            $compile(
-              "<div class='modeler-choices' modeler-data></div>"
-            )($scope)
-          );
-        }
+      console.log(res.data);
+      if (res.data !== false && res.data != 'false'){
+        $scope.meta = res.data;
+        //populate the rest of the data if it exists
+        $scope.sourceexists = true;
+        $scope.metavalid = true;
+        $scope.dataloaded = true;
+        $(".model-columns").html(
+          $compile(
+            "<div class='modeler-choices' modeler-data></div>"
+          )($scope)
+        );
+
 
       }
       else{
-        console.log("there was an error in getting the source");
+        //we don't have a source yet
+        $scope.sourceexists = false;
       }
     });
     //we are editing an existing one go get everything
@@ -321,7 +320,7 @@ modeler.directive('modelSubmit', function ($http) {
             // //taking the same scope as parent
             element.on("click", function () {
               //validate that everything is there any ready to go with the column names
-                $http.post('/api/3/datasets/' + scope.meta.dataset + '/model', 
+                $http.post('/api/3/datasets/' + scope.meta.dataset + '/runmodel', 
                       {"meta": scope.meta, "modeler": scope.modeler})
                       .then(function(res) {
                         if (res.data.success){

@@ -29,6 +29,8 @@
             <input name="sourcefile" type="file" id="sourcefile">
           <p class="help-block" ng-show="form.sourcefile.$invalid"
             ng-bind="form.sourcefile.$message"></p>
+          <p class="fileloaded-block" ng-show="meta.rawfile"
+            ng-bind="meta.rawfile">Here is my file</p>
         </div>
       </div>
       <button type="submit" ng-click="save_meta()" class="btn btn-success" ng-hide="sourceexists">
@@ -40,7 +42,7 @@
       <div>
         <h2>Things for the future</h2>
         <ul>
-          <li>Tagging</li>
+          <li>May put option to skip OpenRefine Processing?</li>
         </ul>
       </div>
     </form>

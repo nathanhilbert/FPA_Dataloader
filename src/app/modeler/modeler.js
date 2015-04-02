@@ -27,19 +27,25 @@ modeler.config(function config( $stateProvider ) {
 modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $location, $http, $compile, validation) {
 
   //placeholder for options should be done in the Flask template
-  $scope.reference = {"prefuncoptions" : [{
-      "code": "json_to_csv", "label": "JSON to CSV"
-    },
-    {
-      "code": "parse_xml_to_csv", "label": "XML to CSV"
-    }]
-  };
+  $scope.reference = {"prefuncoptions" :[]};
+
+  //get the preprocessors from the references
+  $http.get('/api/3/preprocessors')
+    .then(function(res){
+      $scope.reference.prefuncoptions = res.data; 
+    });
+
+
 
   /*get the source information from the API*/
-  if ($stateParams.sourcename){
-    $http.get('/api/3/datasets/' + $stateParams.datasetname + '/model/' + $stateParams.sourcename)
-      .then(function(res){
-        if (res.data){
+
+  $http.get('/api/3/datasets/' + $stateParams.datasetname + '/model')
+    .then(function(res){
+      if (res.data){
+        if (res.data === false){
+          $scope.sourceexists = false;
+        }
+        else{
           $scope.meta = res.data;
           //populate the rest of the data if it exists
           $scope.sourceexists = true;
@@ -51,19 +57,15 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
             )($scope)
           );
         }
-        else{
-          console.log("there was an error try again");
-        }
-      });
+
+      }
+      else{
+        console.log("there was an error in getting the source");
+      }
+    });
     //we are editing an existing one go get everything
 
-  }
-  else{
-    $scope.sourceexists = false;
-    // we creating a new one
-
-
-  }
+  
 
 
 
@@ -133,13 +135,11 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
     }
 
 
-
-
-
-
       //create a new one
 
     };
+
+
 
   $scope.apply_meta_default = function(){
       var dfd = $http.get('/api/3/datasets/' + $stateParams.datasetname + '/applymodel/' + $scope.meta.name );

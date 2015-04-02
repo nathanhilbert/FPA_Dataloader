@@ -14,7 +14,7 @@ modeler.config(function config( $stateProvider ) {
   })
   //edit an existing indicator form
   .state('sourceform_edit', {
-    url: '/:datasetname/source/:sourcename',
+    url: '/:datasetname/source',
     views: {
       "main": {
         //controller: 'CubeOptionsCtrl',
@@ -80,7 +80,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
-          $location.path("/" + $scope.meta.dataset + "/source/" + $scope.meta.id);
+          $location.path("/" + $scope.meta.dataset + "/source/");
           $(".model-columns").html(
             $compile(
               "<div class='modeler-choices' modeler-data></div>"
@@ -142,7 +142,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
 
 
   $scope.apply_meta_default = function(){
-      var dfd = $http.get('/api/3/datasets/' + $stateParams.datasetname + '/applymodel/' + $scope.meta.name );
+      var dfd = $http.get('/api/3/datasets/' + $stateParams.datasetname + '/applymodel');
       dfd.then(function(res){
         if(res.data){
           $scope.meta = res.data;
@@ -150,7 +150,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
-          $location.path("/" + $scope.meta.dataset + "/source/" + $scope.meta.name);
+          $location.path("/" + $scope.meta.dataset + "/source");
           $(".model-columns").html(
             $compile(
               "<div class='modeler-choices' modeler-data></div>"
@@ -194,7 +194,7 @@ modeler.directive('openRefineFetch', function ($http) {
             // //taking the same scope as parent
             element.on("click", function () {
               if (scope.meta.ORid){
-                $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name + '/ORoperations')
+                $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/ORoperations')
                   .then(function(res){
                     if (res.data){
                       scope.meta.ORoperations = angular.toJson(res.data);
@@ -231,7 +231,7 @@ modeler.directive('modelerData', function ($http) {
             globalness = scope;
 
             scope.updateModel = function(){
-                $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name + '/fields')
+                $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/fields')
                 .then(function(res){
                   if (res.data){
                     var tempcolumns = [];
@@ -286,12 +286,12 @@ modeler.directive('modelFieldChecker', function($http){
                 //     //if something
                 //   });      
                 // };
-                $http.post('/api/3/datasets/' + scope.$parent.meta.dataset + '/model/' + scope.$parent.meta.name + '/fieldcheck/' + scope.columnkey, 
+                $http.post('/api/3/datasets/' + scope.$parent.meta.dataset + '/model/fieldcheck/' + scope.columnkey, 
                       {"columnval": scope.columnvalue.column})
                       .then(function(res) {
-                        if (res.data.Success){
+                        if (res.data.success){
                           scope.loadsuccess = true;
-                          scope.message = "Data is now loaded";
+                          scope.message = "Everything looks good for this column";
                         }
                         else{
                           scope.message = res.data.message + res.data.errors;
@@ -321,10 +321,10 @@ modeler.directive('modelSubmit', function ($http) {
             // //taking the same scope as parent
             element.on("click", function () {
               //validate that everything is there any ready to go with the column names
-                $http.post('/api/3/datasets/' + scope.meta.dataset + '/model/' + scope.meta.name, 
+                $http.post('/api/3/datasets/' + scope.meta.dataset + '/model', 
                       {"meta": scope.meta, "modeler": scope.modeler})
                       .then(function(res) {
-                        if (res.data.Success){
+                        if (res.data.success){
                           scope.submitmessage = "everything is ok";
                           scope.loadsuccess = true;
                         }
@@ -354,10 +354,10 @@ modeler.directive('modelOrgSubmit', function ($http) {
             // //taking the same scope as parent
             element.on("click", function () {
               //validate that everything is there any ready to go with the column names
-                $http.post('/api/3/datasets/' + scope.meta.dataset + '/applymodel/' + scope.meta.name, 
+                $http.post('/api/3/datasets/' + scope.meta.dataset + '/applymodel', 
                       {"meta": scope.meta, "modeler": scope.modeler})
                       .then(function(res) {
-                        if (res.data.Success){
+                        if (res.data.success){
                           scope.orgmessage = "everything is ok";
                         }
                         else{

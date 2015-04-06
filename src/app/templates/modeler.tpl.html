@@ -33,8 +33,27 @@
             ng-bind="meta.rawfile">Here is my file</p>
         </div>
       </div>
-      <button type="submit" ng-click="save_meta()" class="btn btn-success" ng-hide="sourceexists">
-        Save
+
+      <h1>PreFunctions</h1>
+          <div class="form-group" ng-class="{'has-error': form.prefuncs.$invalid}">
+            <label for="prefuncs" class="col-sm-2 control-label">
+              Preprocessing Functions
+            </label>
+            <div class="col-sm-10">
+              <select name="prefuncs" class="form-control"
+                ng-model="meta.prefuncs" disable-search="true"
+                ng-options="c.value as c.label for c in reference.prefuncoptions" multiple>
+              </select>
+              <p class="help-block" ng-show="form.prefuncs.$invalid"
+                ng-bind="form.prefuncs.$message"></p>
+            </div>
+          </div>
+
+
+
+
+      <button type="submit" ng-click="save_meta()" class="btn btn-success">
+        Save (will revert any work in OpenRefine)
       </button>
       <button type="submit" ng-click="apply_meta_default()" class="btn btn-success" ng-show="sourceexists">
         Apply Default From Org
@@ -47,22 +66,6 @@
       </div>
     </form>
 
-    <h1>PreFunctions</h1>
-      <div ng-show="metavalid">
-          <div class="form-group" ng-class="{'has-error': form.category.$invalid}">
-            <label for="category" class="col-sm-2 control-label">
-              Category
-            </label>
-            <div class="col-sm-10">
-              <select name="category" chosen class="form-control"
-                ng-model="meta.prefuncs" disable-search="true"
-                ng-options="c.code as c.label for c in reference.prefuncoptions" multiple>
-              </select>
-              <p class="help-block" ng-show="form.category.$invalid"
-                ng-bind="form.category.$message"></p>
-            </div>
-          </div>
-      </div>
 
     <h1>ORstuff</h1>
       <div ng-show="metavalid">

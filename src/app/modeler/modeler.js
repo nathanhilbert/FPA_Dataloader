@@ -42,7 +42,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
 
   $http.get('/api/3/datasets/' + $stateParams.datasetname + '/model')
     .then(function(res){
-      console.log(res.data);
+
       if (res.data !== false && res.data != 'false'){
         $scope.meta = res.data;
         //populate the rest of the data if it exists
@@ -73,13 +73,13 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
 
     var handleresponse = function(res) {
         //$location.path('/' + res.data.name + '/manage/meta');
-        if (res.data){
-          $scope.meta = res.data;
+        if (res){
+          $scope.meta = res;
           //populate the rest of the data if it exists
           $scope.sourceexists = true;
           $scope.metavalid = true;
           $scope.dataloaded = true;
-          $location.path("/" + $scope.meta.dataset + "/source/");
+          $location.path("/" + $scope.meta.dataset + "/source");
           $(".model-columns").html(
             $compile(
               "<div class='modeler-choices' modeler-data></div>"
@@ -103,6 +103,7 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
        //only one file
        form_data.append("sourcefile", $('#sourcefile')[0].files[0]);
        form_data.append("name", $scope.meta.name);
+       form_data.append("prefuncs", JSON.stringify($scope.meta.prefuncs));
 
 
         $.ajax({
@@ -116,18 +117,26 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
             success: handleresponse
         });
     }
-    else if ($scope.meta.url !== ""){
+    else if ($scope.meta.url !== null){
         $.ajax({
             type: 'POST',
             url: '/api/3/datasets/' + $stateParams.datasetname + '/model',
-            data: {'name': $scope.meta.name, 'url': $scope.meta.url},
-            contentType: false,
+            data: {'name': $scope.meta.name, 'url': $scope.meta.url, 'prefuncs': JSON.stringify($scope.meta.prefuncs)},
             cache: false,
-            processData: false,
-            async: false,
             success: handleresponse
         });
 
+    }
+    else if ($scope.sourceexists){
+      //this will update it all
+        console.log($scope.meta.prefuncs);
+        $.ajax({
+            type: 'POST',
+            url: '/api/3/datasets/' + $stateParams.datasetname + '/model',
+            data: {'name': $scope.meta.name, 'prefuncs':JSON.stringify($scope.meta.prefuncs)},
+            cache: false,
+            success: handleresponse
+        });
     }
     else{
       console.log("You must provide a URL or file");

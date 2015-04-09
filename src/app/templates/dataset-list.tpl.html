@@ -3,41 +3,9 @@
     <div class="panel-heading">
         <h2> Data Sources List </h2>
     </div>
-    <div class="panel-body">
-        <div class="input-group">
-            <span class="input-group-addon">
-                <span class="glyphicon glyphicon-search"></span>
-            </span>
-            <input type="search" class="form-control search" placeholder="Search Data Source" ng-model="query">
-        </div>
-    </div>
     <h2>Click the "Create new datasource" or select an existing on to update or click the "+" beside the datasource to add a new indicator</h2>
-    <div class="list-group">
-        <div class="datasource-group" ng-repeat="dataset in datasets | filter:query">
-        
 
-            <a class="list-group-item"
-                href="#/{{dataset.name}}/manage">
-                {{dataset.label || dataset.name || "(no name)"}}
-                <small>({{dataset.name || "no name"}})</small>
-            </a>
-            <a class="list-group-item"
-                href="#/{{dataset.name}}/source" ng-hide="dataset.has_data">
-                **Add Data***
-            </a>
-            <a class="list-group-item"
-                href="#/{{dataset.name}}/source" ng-show="dataset.has_data">
-                **Edit Data***
-            </a>
-            <div class="list-source-group">
-                <div ng-repeat="source in dataset.sources">
-                    <a class="list-source-item"
-                        href="#/{{dataset.name}}/source/{{source.name}}">
-                            -- {{source.label || source.name}} <small>({{source.name || "no name"}})</small> </a>
-                            <button ng-click='deleteSource(dataset.name,source.name)'>Delete</button>
-                    <br /> 
-                </div>
+    <div>{{ table_loading }}</div>
+    <table class="datatable-preview" ng-hide="table_loading"></table>
 
-            </div>
-    </div>
 </div>

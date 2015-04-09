@@ -195,7 +195,7 @@ modeler.directive('openRefine', function () {
 modeler.directive('openRefineFetch', function ($http) {
         return {
           restrict: 'A',
-          template: '<button>Fetch OR Instructions</button>',
+          template: '<button>Update Columns for Modeler</button>',
           //transclude: true,
           link: function postLink(scope, element, attrs) {
          

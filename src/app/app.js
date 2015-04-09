@@ -112,6 +112,8 @@ openspending.factory('referenceData', ['$http', function($http) {
 }]);
 
 
+
+
 openspending.controller('DatasetNewCtrl', ['$scope', '$http', '$window', '$location', '$stateParams', 'referenceData', 'validation',
   function($scope, $http, $window, $location, $stateParams, referenceData, validation) {
   /* This controller is not activated via routing, but explicitly through the 
@@ -231,13 +233,50 @@ openspending.controller('SourceFormCtrl', ['$scope', '$http', '$window', '$locat
 
 }]);
 
+
+
+var getDataTableOptions = function(resobj){
+
+
+  var basekeys = _.keys(resobj[0]);
+  var headers = [{data:"loaddata", title:"load link"}];
+  _.each(basekeys, function(val, key){
+    //backslash per https://datatables.net/reference/option/columns.render
+    headers.push({data:val.replace('.', '\\.'), title:val.replace('.', '\\.')});
+  });
+
+
+  _.each(resobj, function(val, key){
+    val['loaddata'] = '<a class="list-group-item" href="#/' + val['name'] + '/source"> **Edit Data***</a>';
+
+  });
+
+  return {data: resobj,
+          columns: headers,
+          destroy: true};
+};
+
+
+
 openspending.controller('datasetListCrl', ['$scope', '$http', 'OSAPIservice', '$location', 
   function($scope, $http, OSAPIservice, $location) {
+
+    $scope.table_loading= "Loading....";
 
     $scope.datasets = [];
     OSAPIservice.getDatasets({'fields':"name,label"})
     .success(function (response) {
       $scope.datasets = response;
+
+      var dtops = getDataTableOptions(response); 
+      //$scope.table_obj = getTablefromDict(response.cells);
+      
+      if ($scope.table_obj){
+        $scope.table_obj.destroy();
+        $(".datatable-preview").empty();
+      }
+      $scope.table_obj = $(".datatable-preview").DataTable(dtops);
+      $scope.table_loading = null;
     });
 
     $scope.deleteSource = function(datasetname, sourcename){
@@ -262,6 +301,7 @@ openspending.controller('datasetListCrl', ['$scope', '$http', 'OSAPIservice', '$
     };
 
 }]);
+
 
 
 

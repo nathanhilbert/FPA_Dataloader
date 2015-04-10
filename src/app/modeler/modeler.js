@@ -201,7 +201,7 @@ modeler.directive('openRefineFetch', function ($http) {
          
             // //taking the same scope as parent
             element.on("click", function () {
-              if (scope.meta.ORid){
+              if (scope.meta.ORURL){
                 $http.get('/api/3/datasets/' + scope.meta.dataset + '/model/ORoperations')
                   .then(function(res){
                     if (res.data){

@@ -8,7 +8,7 @@
 
 <div>Going to assume we have a valid url and it loaded above into the OR project</div>
 <ul>
-  <li>1.Go to OpenRefine URL: <a href="http://127.0.0.1:3333/project?project={{ meta.ORid }}" target=="_blank"> http://localhost:3333/project?project={{ meta.ORid }}</a></li>
+  <li>1.Go to OpenRefine URL: <a href="{{ meta.ORURL }}" target=="_blank"> {{ meta.ORURL }}</a></li>
   <li>2. Make edits</li>
   <li>3. <button open-refine-fetch>Update Columns from OpenRefine</button> to load your operations in the text field</li>
   <li>This will reload the data and update everything</li> 

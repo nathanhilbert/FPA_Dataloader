@@ -65,14 +65,13 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
     //we are editing an existing one go get everything
 
   
-
-
-
+    $(".save_buttons_loader").hide();
   $scope.save_meta = function() {
-
+    $(".save_buttons_loader").show();
 
     var handleresponse = function(res) {
         //$location.path('/' + res.data.name + '/manage/meta');
+
         if (res){
           $scope.meta = res;
           //populate the rest of the data if it exists
@@ -90,11 +89,14 @@ modeler.controller( 'ModelerCtrl', function ModelerCtrl( $scope, $stateParams, $
           //error message
           console.log(res);
         }
+        $(".save_buttons_loader").hide();
       };
 
     // form validation
     //check that there are actually values
     //name must be unique
+
+
 
     if ($('#sourcefile')[0].files.length == 1){
 
@@ -325,20 +327,24 @@ modeler.directive('modelSubmit', function ($http) {
           //transclude: true,
           link: function postLink(scope, element, attrs) {
             scope.submitmessage = "";
+            scope.datarunning = false;
          
             // //taking the same scope as parent
             element.on("click", function () {
-              //validate that everything is there any ready to go with the column names
+                scope.datarunning = true;
+
+                //validate that everything is there any ready to go with the column names
                 $http.post('/api/3/datasets/' + scope.meta.dataset + '/runmodel', 
                       {"meta": scope.meta, "modeler": scope.modeler})
                       .then(function(res) {
                         if (res.data.success){
-                          scope.submitmessage = "everything is ok";
+                          scope.submitmessage = "RUN Success";
                           scope.loadsuccess = true;
                         }
                         else{
                           scope.submitmessage = res.data.message + res.data.errors;
                         }
+                        scope.datarunning = false;
                           //scope.polling = false;
                           //when this comes back turn off
 

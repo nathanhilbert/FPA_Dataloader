@@ -29,8 +29,9 @@
             <input name="sourcefile" type="file" id="sourcefile">
           <p class="help-block" ng-show="form.sourcefile.$invalid"
             ng-bind="form.sourcefile.$message"></p>
-          <p class="fileloaded-block" ng-show="meta.rawfile"
-            ng-bind="meta.rawfile">Here is my file</p>
+          <p class="fileloaded-block" ng-show="meta.rawfile">
+            <a href="{{ meta.rawfile.url }}" target="_blank"> {{ meta.rawfile.url }}</a>
+          </p>
         </div>
       </div>
 
@@ -51,13 +52,17 @@
 
 
 
-
-      <button type="submit" ng-click="save_meta()" class="btn btn-success">
-        Save (will revert any work in OpenRefine)
-      </button>
-      <button type="submit" ng-click="apply_meta_default()" class="btn btn-success" ng-show="sourceexists">
-        Apply Default From Org
-      </button>
+      <div class="save_buttons">
+        <button type="submit" ng-click="save_meta()" class="btn btn-success">
+          Save (will revert any work in OpenRefine)
+        </button>
+        <button type="submit" ng-click="apply_meta_default()" class="btn btn-success" ng-show="sourceexists">
+          Apply Default From Org
+        </button>
+      </div>
+      <div class="save_buttons_loader">
+        Saving.......
+      </div>
       <div>
         <h2>Things for the future</h2>
         <ul>
@@ -80,7 +85,8 @@
 
     <br />
     <br />
-    <div model-submit ng-show="dataloaded && metavalid"></div>
+    <div model-submit ng-show="dataloaded && metavalid && ! datarunning"></div>
+    <div model-submit ng-show="datarunning">Running the Data</div>
 
     <div model-org-submit ng-show="loadsuccess"></div>
 

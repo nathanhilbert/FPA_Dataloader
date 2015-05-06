@@ -23,13 +23,14 @@
           <p class="help-block" ng-show="form.label.$invalid"
             ng-bind="form.label.$message"></p>
         </div>
-        <h1>OR</h1>
+        <h2>OR</h2>
         <div class="col-sm-10">
             <label for="sourcefile">Select a file</label>
             <input name="sourcefile" type="file" id="sourcefile">
           <p class="help-block" ng-show="form.sourcefile.$invalid"
             ng-bind="form.sourcefile.$message"></p>
           <p class="fileloaded-block" ng-show="meta.rawfile">
+            Current File Loaded: 
             <a href="{{ meta.rawfile.url }}" target="_blank"> {{ meta.rawfile.url }}</a>
           </p>
         </div>

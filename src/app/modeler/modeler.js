@@ -333,6 +333,34 @@ modeler.directive('modelSubmit', function ($http) {
             element.on("click", function () {
                 scope.datarunning = true;
 
+                //put post where it should be and it can pass off to celery
+                //re
+
+
+                // $("#completeform").submit(function(form){
+                //     uuid = getUUID()
+                //     $("#uuid").val(uuid);
+                //     $("#statustext").html("Running Cleaning Operations");
+                //     var myinterval = setInterval(function() {
+                //         var myobj = {'uuid': uuid};
+                //         var fails = 0
+                //         $.ajax({
+                //             type: 'GET',
+                //             url: '/upload_status',
+                //             data: myobj,
+                //             cache: false,
+                //             success: handleresponse,
+                //             error: function(){
+                //                 $("#statustext").html("Processing Complete.  A file should have downloaded.  You can now use a new file.");
+                //                 $("[name=getdownload]").show();
+                //                 clearInterval(myinterval);
+                //             }
+                //         });
+                //     }, 5000); //5 seconds
+
+
+
+
                 //validate that everything is there any ready to go with the column names
                 $http.post('/api/3/datasets/' + scope.meta.dataset + '/runmodel', 
                       {"meta": scope.meta, "modeler": scope.modeler})
